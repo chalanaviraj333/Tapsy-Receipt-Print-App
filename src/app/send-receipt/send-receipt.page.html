@@ -1,0 +1,91 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Create Receipt</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+<ion-content>
+  <ion-grid>
+    <form #f="ngForm" (ngSubmit)="onSubmit(f)">
+    <ion-row>
+      <ion-col size="8">
+        <ion-item lines="none">
+          <ion-label>
+            {{this.receiptDetails.date.toISOString().split('T')[0]}}
+          </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col size="4">
+        <ion-button size="small" color="success">Change</ion-button>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-button expand="block" color="dark" fill="outline" (click)="presentActionSheet();">Job Type</ion-button>
+      </ion-col>
+    </ion-row>
+    <ion-row class="margin-class">
+      <ion-col size="12">
+        <ion-list>
+          <ion-item>
+            <ion-select placeholder="Select Service" required>
+              <ion-select-option *ngFor="let serviceItem of serviceList" ngModel name="serviceType" value="{{serviceItem}}">{{serviceItem}}</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-list>
+      </ion-col>
+    </ion-row>
+
+    <ion-row class="margin-class">
+      <ion-col size="12">
+        <ion-item>
+          <ion-input type="tel" ngModel name="receiptPrice" placeholder="Enter Price" required></ion-input>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <ion-row class="margin-class">
+      <ion-col size="12">
+        <ion-item>
+          <ion-input type="text" ngModel name="customerName" placeholder="Customer Name"></ion-input>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <ion-row class="margin-class">
+      <ion-col size="12">
+        <ion-item>
+          <ion-input type="tel" ngModel name="PhoneNo" placeholder="Phone No"></ion-input>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <ion-row class="margin-class">
+      <ion-col size="12">
+        <ion-item>
+          <ion-input type="email" ngModel name="cusomteremail" placeholder="Email"></ion-input>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+  </form>
+  </ion-grid>
+
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-button (click)="f.ngSubmit.emit()" [disabled]="!f.valid" color="secondary" fill="outline" expand="block">Email Receipt</ion-button>
+    <ion-button (click)="f.ngSubmit.emit()" [disabled]="!f.valid" color="success" expand="block">Print Receipt</ion-button>
+  </ion-toolbar>
+</ion-footer>
+
+<!-- (click)="f.ngSubmit.emit()" [disabled]="!f.valid" -->
