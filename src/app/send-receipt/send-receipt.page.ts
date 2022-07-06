@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActionSheetController } from '@ionic/angular';
 import { ReceiptDetails } from '../interfaces/receipt-details';
+import { DatabaseSerService } from '../services/database-services/database-ser.service';
 
 @Component({
   selector: 'app-send-receipt',
@@ -10,12 +11,13 @@ import { ReceiptDetails } from '../interfaces/receipt-details';
 })
 export class SendReceiptPage implements OnInit {
 
-  public receiptDetails: ReceiptDetails = {receiptID: 0, date: new Date(), jobType: '', ServiceType: '', Price: 0, customername: '', customerPhoneNo: ''};
   public serviceList: Array<string> = [];
   private domesticServiceList: Array<string> = ['Lock Rekey', 'Lock Repair', 'Lock Supply', 'Other'];
   private vehicleServiceList: Array<string> = ['Spare Remote', 'Spare Normal Key', 'Spare Remote AM', 'Door Lock Rekey', 'Ignition Repair', 'Roof Rack Key Cut', 'Gaining Entry', 'Other'];
+  private selectedJobType: string = '';
+  public todayDate: Date = new Date();
 
-  constructor(public actionSheetController: ActionSheetController) { }
+  constructor(public actionSheetController: ActionSheetController, private databaseService: DatabaseSerService) { }
 
   ngOnInit() {
   }
@@ -34,6 +36,7 @@ export class SendReceiptPage implements OnInit {
         },
         handler: () => {
           this.serviceList = this.domesticServiceList;
+          this.selectedJobType = 'Domestic';
         }
       }, {
         text: 'Vehicle',
@@ -41,6 +44,7 @@ export class SendReceiptPage implements OnInit {
         data: 10,
         handler: () => {
           this.serviceList = this.vehicleServiceList;
+          this.selectedJobType = 'Automotive';
         }
       }, {
         text: 'Other',
@@ -48,6 +52,7 @@ export class SendReceiptPage implements OnInit {
         data: 'Data value',
         handler: () => {
           this.serviceList = [];
+          this.selectedJobType = 'Other';
         }
       }, {
         text: 'Cancel',
@@ -65,17 +70,20 @@ export class SendReceiptPage implements OnInit {
   }
 
   onSubmit(form: NgForm) {
-    // const newCarNote: CarNote = {
-    //   brand: this.selectedCar.carbrand,
-    //   userename: this.username,
-    //   model: this.selectedCar.model,
-    //   selectedyear: this.selectedCar.selectedyear,
-    //   carnotesDescription: form.value.carnote,
-    //   date: new Date(),
-    // };
 
-    // this.databaseService.addtonotes(newCarNote);
-    // this.modalController.dismiss();
-  }
+    const newReceiptData: ReceiptDetails = {
+      receiptID: null,
+      date: new Date(),
+      jobType: this.selectedJobType,
+      serviceType: form.value.serviceType,
+      price: form.value.receiptPrice,
+      customerName: form.value.customerName,
+      customerPhoneNo: form.value.phoneNo,
+      customerEmail: form.value.cusomteremail
+    };
+
+    this.databaseService.sendReceiptDataToDatabase(newReceiptData);
+
+    }
 
 }
