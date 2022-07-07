@@ -24,30 +24,14 @@
         </ion-item>
       </ion-col>
       <ion-col size="4">
-        <ion-button size="small" color="success">Change</ion-button>
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col>
-        <ion-button expand="block" color="dark" fill="outline" (click)="presentActionSheet();">Job Type</ion-button>
-      </ion-col>
-    </ion-row>
-    <ion-row class="margin-class">
-      <ion-col size="12">
-        <ion-list>
-          <ion-item>
-            <ion-select placeholder="Select Service" ngModel name="serviceType" required>
-              <ion-select-option *ngFor="let serviceItem of serviceList" value="{{serviceItem}}">{{serviceItem}}</ion-select-option>
-            </ion-select>
-          </ion-item>
-        </ion-list>
+        <ion-button size="small" color="success" disabled>Change</ion-button>
       </ion-col>
     </ion-row>
 
     <ion-row class="margin-class">
       <ion-col size="12">
         <ion-item>
-          <ion-input type="tel" ngModel name="receiptPrice" placeholder="Enter Price" required></ion-input>
+          <ion-input type="text" [(ngModel)]="printReceiptDetails.customerName" name="customerName" placeholder="Customer Name" required></ion-input>
         </ion-item>
       </ion-col>
     </ion-row>
@@ -55,7 +39,7 @@
     <ion-row class="margin-class">
       <ion-col size="12">
         <ion-item>
-          <ion-input type="text" ngModel name="customerName" placeholder="Customer Name" required></ion-input>
+          <ion-input type="tel" [(ngModel)]="printReceiptDetails.customerPhoneNo"  name="phoneNo" placeholder="Phone No"></ion-input>
         </ion-item>
       </ion-col>
     </ion-row>
@@ -63,20 +47,191 @@
     <ion-row class="margin-class">
       <ion-col size="12">
         <ion-item>
-          <ion-input type="tel" ngModel name="phoneNo" placeholder="Phone No"></ion-input>
+          <ion-input type="email" [(ngModel)]="printReceiptDetails.customerEmail"  name="cusomteremail" placeholder="Email"></ion-input>
         </ion-item>
       </ion-col>
     </ion-row>
 
-    <ion-row class="margin-class">
-      <ion-col size="12">
-        <ion-item>
-          <ion-input type="email" ngModel name="cusomteremail" placeholder="Email"></ion-input>
-        </ion-item>
-      </ion-col>
-    </ion-row>
+
+    <ion-card>
+      <ion-card-header>Add Services</ion-card-header>
+      <ion-card-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col>
+              <ion-button expand="block" color="dark" fill="outline" (click)="presentActionSheet();">Job Type</ion-button>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size="12">
+              <ion-list>
+                <ion-item>
+                  <ion-select placeholder="Select Service" ngModel name="serviceType" required>
+                    <ion-select-option *ngFor="let serviceItem of serviceList" value="{{serviceItem}}">{{serviceItem}}</ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </ion-list>
+            </ion-col>
+          </ion-row>
+
+          <ion-row>
+            <ion-col size="8">
+              <ion-item>
+                <ion-input type="tel" ngModel name="receiptPrice" placeholder="Enter Price" required></ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size="4">
+              <ion-item>
+                <ion-input type="number" ngModel="{{defaultValue}}" name="itemQuantity" required></ion-input>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+
+          <ion-row>
+            <ion-col size="12">
+              <ion-textarea rows="3" ngModel name="serviceDescription" placeholder="Description"></ion-textarea>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+        <div style="text-align: right;">
+          <ion-button color="success">
+            ADD
+            <ion-icon slot="end" name="add-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
   </form>
   </ion-grid>
+
+  <!-- invoice view starts here -->
+  <div id="PrintInvoice" class="invoice-box"
+  style="max-width: 800px;margin: auto;padding: 30px;border: 1px solid #eee;box-shadow: 0 0 10px rgba(0, 0, 0, .15);font-size: 16px;line-height: 24px;font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;color: #555;">
+  <table cellpadding="0" cellspacing="0" style="width: 100%;line-height: inherit;text-align: left;">
+    <tr class="top">
+      <td colspan="3" style="padding: 5px;vertical-align: top;">
+        <table style="width: 100%;line-height: inherit;text-align: left;">
+          <tr>
+            <td class="title"
+              style="padding: 5px;vertical-align: top;padding-bottom: 20px;font-size: 45px;line-height: 45px;color: #333;">
+              <img src="{{companyLogo}}" style="width:100%; max-width:130px;">
+            </td>
+
+            <td style="padding: 5px;vertical-align: top;text-align: right;padding-bottom: 20px;">
+              <span style="font-size: 32px;">TAX INVOICE</span>
+              <br>
+              <span style="font-size: 24px;">No: A102</span>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr class="information">
+      <td colspan="3" style="padding: 5px;vertical-align: top;">
+        <table style="width: 100%;line-height: inherit;text-align: left;">
+          <tr>
+            <td style="padding: 5px;vertical-align: top;padding-bottom: 40px;">
+              <p style="font-size: 17px; line-height: 1.5;">
+                Tapsy Services PTY LTD
+                <br>
+              817 Logan Road
+              <br>
+              Holland Park West
+              <br>
+              QLD 4121
+              </p>
+            </td>
+
+            <td style="padding: 5px;vertical-align: top;text-align: right;padding-bottom: 40px;">
+              <span style="font-size: 17px;">Date: {{printReceiptDetails.date.toISOString().split('T')[0]}}</span>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr class="information">
+      <td colspan="2" style="padding: 5px;vertical-align: top;">
+        <table style="width: 100%;line-height: inherit;text-align: left;">
+          <tr>
+            <td style="padding: 5px;vertical-align: top;padding-bottom: 40px;">
+              <span style="font-size: 17px;">Bill to:</span>
+              <br>
+              <span style="font-size: 18px;">Name: {{printReceiptDetails.customerName}}</span>
+              <br>
+              <span *ngIf="printReceiptDetails.customerPhoneNo !== ''" style="font-size: 18px;">Phone: {{printReceiptDetails.customerPhoneNo}}</span>
+              <br>
+              <span *ngIf="printReceiptDetails.customerEmail !== ''" style="font-size: 18px;">email: {{printReceiptDetails.customerEmail}}</span>
+
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr class="heading">
+      <td style="padding: 5px;vertical-align: top;background: #eee;border-bottom: 1px solid #ddd;font-weight: bold;">
+        DESCRIPTION
+      </td>
+
+      <td
+        style="padding: 5px;vertical-align: top; text-align: right;background: #eee;border-bottom: 1px solid #ddd;font-weight: bold;">
+        QTY
+      </td>
+
+      <td
+        style="padding: 5px;vertical-align: top; text-align: right; background: #eee;border-bottom: 1px solid #ddd;font-weight: bold;">
+        AMOUNT
+      </td>
+    </tr>
+
+    <tr *ngFor="let item of receiptServiceItems" class="item">
+      <td style="padding: 5px;vertical-align: top;border-bottom: 1px solid #eee;">
+        {{item.description}}
+      </td>
+
+      <td style="padding: 5px;vertical-align: top;text-align: right; border-bottom: 1px solid #eee;">
+        1
+      </td>
+
+      <td style="padding: 5px;vertical-align: top; text-align: right; border-bottom: 1px solid #eee;">
+        ${{item.price | number : '1.2-2'}}
+      </td>
+    </tr>
+
+
+    <tr class="total" style="margin-top: 20px;">
+      <td style="padding: 5px;vertical-align: top;"></td>
+
+      <td style="padding: 5px;vertical-align: top;text-align: right;font-size: 16px;">
+        <!-- Total: ${{order.grandTotal}} -->
+        <span>SUBTOTAL</span>
+        <br>
+        <span>GST</span>
+        <br>
+        <span>TOTAL</span>
+        <br>
+        <span>AMOUNT DUE</span>
+        <br>
+      </td>
+
+      <td style="padding: 5px;vertical-align: top;text-align: right;border-bottom: 1px solid #eee;font-size: 16px;">
+        <!-- Total: ${{order.grandTotal}} -->
+        <span>$119.00</span>
+        <br>
+        <span>$20.00</span>
+        <br>
+        <span style="font-weight: bold;">$139.00</span>
+        <br>
+        <span>$0.00</span>
+        <br>
+      </td>
+    </tr>
+  </table>
+</div>
+  <!-- invocie view ends here -->
 
 </ion-content>
 <ion-footer>

@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Printer } from '@awesome-cordova-plugins/printer/ngx';
+import { PDFGenerator } from '@ionic-native/pdf-generator/ngx';
 import { ActionSheetController } from '@ionic/angular';
+import { Jobitems } from '../interfaces/jobitems';
 import { ReceiptDetails } from '../interfaces/receipt-details';
 import { DatabaseSerService } from '../services/database-services/database-ser.service';
 
@@ -17,7 +20,19 @@ export class SendReceiptPage implements OnInit {
   private selectedJobType: string = '';
   public todayDate: Date = new Date();
 
-  constructor(public actionSheetController: ActionSheetController, private databaseService: DatabaseSerService) { }
+  public defaultValue: number = 1;
+
+  public companyLogo: string = 'https://firebasestorage.googleapis.com/v0/b/tapsy-invoice-app.appspot.com/o/blackandwhite.png?alt=media&token=1c696f0a-d8dc-4a35-8b28-2b00605dc950'
+
+  public receiptServiceItems: Array<Jobitems> = [{description: 'car key replacement', price: 290},{description:'locked out', price: 120}];
+
+  public printFile: any;
+
+  private content: string;
+
+  public printReceiptDetails: ReceiptDetails = {receiptID: null, date: new Date(), jobType: '', serviceType: '', price: 0, customerName: '', customerPhoneNo: '', customerEmail: ''}
+
+  constructor(public actionSheetController: ActionSheetController, private databaseService: DatabaseSerService, private pdfGenerator: PDFGenerator, private printer: Printer) { }
 
   ngOnInit() {
   }
@@ -82,8 +97,38 @@ export class SendReceiptPage implements OnInit {
       customerEmail: form.value.cusomteremail
     };
 
+    this.printReceiptDetails = newReceiptData;
     this.databaseService.sendReceiptDataToDatabase(newReceiptData);
+    this.downloadInvoice();
 
+    }
+
+
+    downloadInvoice() {
+      this.content = document.getElementById('PrintInvoice').innerHTML;
+      let options = {
+        documentSize: 'A4',
+        // type: 'share',
+        // landscape: 'portrait',
+        fileName: 'Sale-Receipt.pdf'
+      };
+
+      this.pdfGenerator.fromData(this.content, options)
+        .then((base64) => {
+          this.printFile = base64;
+          this._onClickPrintInstrauctions();
+        }).catch((error) => {
+          console.log('error', error);
+        });
+
+    }
+
+
+    _onClickPrintInstrauctions() {
+
+      this.printer.print(`base64://${this.printFile}`).then(onSuccess => {
+        console.log('send to printer')
+      });
     }
 
 }

@@ -14,6 +14,14 @@ const routes: Routes = [
   {
     path: 'send-receipt',
     loadChildren: () => import('./send-receipt/send-receipt.module').then( m => m.SendReceiptPageModule)
+  },
+  {
+    path: 'test-printing',
+    loadChildren: () => import('./test-printing/test-printing/test-printing.module').then( m => m.TestPrintingPageModule)
+  },
+  {
+    path: 'invoice-view',
+    loadChildren: () => import('./invoice-view/invoice-view/invoice-view.module').then( m => m.InvoiceViewPageModule)
   }
 ];
 
