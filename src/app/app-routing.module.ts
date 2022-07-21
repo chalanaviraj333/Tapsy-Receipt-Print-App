@@ -16,13 +16,21 @@ const routes: Routes = [
     loadChildren: () => import('./send-receipt/send-receipt.module').then( m => m.SendReceiptPageModule)
   },
   {
-    path: 'test-printing',
-    loadChildren: () => import('./test-printing/test-printing/test-printing.module').then( m => m.TestPrintingPageModule)
+    path: 'view-today-receipts',
+    loadChildren: () => import('./today-receipts/view-today-receipts/view-today-receipts.module').then( m => m.ViewTodayReceiptsPageModule)
   },
   {
-    path: 'invoice-view',
-    loadChildren: () => import('./invoice-view/invoice-view/invoice-view.module').then( m => m.InvoiceViewPageModule)
-  }
+    path: 'search-receipt',
+    loadChildren: () => import('./search-receipt/search-receipt/search-receipt.module').then( m => m.SearchReceiptPageModule)
+  },
+  {
+    path: 'receipt-more-view',
+    loadChildren: () => import('./model-pages/receipt-view-page/receipt-more-view/receipt-more-view.module').then( m => m.ReceiptMoreViewPageModule)
+  },
+  {
+    path: 'search-receipt/receipt-search-result',
+    loadChildren: () => import('./search-receipt/search-results/receipt-search-result/receipt-search-result.module').then( m => m.ReceiptSearchResultPageModule)
+  },
 ];
 
 @NgModule({

@@ -3,6 +3,7 @@ import { NgForm } from '@angular/forms';
 import { Printer } from '@awesome-cordova-plugins/printer/ngx';
 import { PDFGenerator } from '@ionic-native/pdf-generator/ngx';
 import { ActionSheetController } from '@ionic/angular';
+import { CustomerDetails } from '../interfaces/customer-details';
 import { Jobitems } from '../interfaces/jobitems';
 import { ReceiptDetails } from '../interfaces/receipt-details';
 import { DatabaseSerService } from '../services/database-services/database-ser.service';
@@ -14,27 +15,26 @@ import { DatabaseSerService } from '../services/database-services/database-ser.s
 })
 export class SendReceiptPage implements OnInit {
 
-  public serviceList: Array<string> = [];
-  private domesticServiceList: Array<string> = ['Lock Rekey', 'Lock Repair', 'Lock Supply', 'Other'];
-  private vehicleServiceList: Array<string> = ['Spare Remote', 'Spare Normal Key', 'Spare Remote AM', 'Door Lock Rekey', 'Ignition Repair', 'Roof Rack Key Cut', 'Gaining Entry', 'Other'];
-  private selectedJobType: string = '';
+  public frontEndserviceList: Array<string> = [];
+  public selectedJobType: string = 'Select Type';
   public todayDate: Date = new Date();
+  public receiptServiceItems: Array<Jobitems> = [];
 
-  public defaultValue: number = 1;
+  public customerDetails: CustomerDetails = {customerName: '', customerPhoneNo: '', email: ''};
 
   public companyLogo: string = 'https://firebasestorage.googleapis.com/v0/b/tapsy-invoice-app.appspot.com/o/blackandwhite.png?alt=media&token=1c696f0a-d8dc-4a35-8b28-2b00605dc950'
 
-  public receiptServiceItems: Array<Jobitems> = [{description: 'car key replacement', price: 290},{description:'locked out', price: 120}];
-
   public printFile: any;
-
   private content: string;
+  public defaultValue: number = 1;
+  public receiptSubTotal: number = 0;
 
-  public printReceiptDetails: ReceiptDetails = {receiptID: null, date: new Date(), jobType: '', serviceType: '', price: 0, customerName: '', customerPhoneNo: '', customerEmail: ''}
-
-  constructor(public actionSheetController: ActionSheetController, private databaseService: DatabaseSerService, private pdfGenerator: PDFGenerator, private printer: Printer) { }
+  constructor(public actionSheetController: ActionSheetController, public databaseService: DatabaseSerService, private pdfGenerator: PDFGenerator, private printer: Printer) { }
 
   ngOnInit() {
+    this.databaseService.getReceiptNoFromDatabase();
+    this.databaseService.getdomesticServiceListFromDatabase();
+    this.databaseService.getAutomotiveServiceListFromDatabase();
   }
 
   async presentActionSheet() {
@@ -50,15 +50,15 @@ export class SendReceiptPage implements OnInit {
           type: 'delete'
         },
         handler: () => {
-          this.serviceList = this.domesticServiceList;
+          this.frontEndserviceList = this.databaseService.domesticServiceList;
           this.selectedJobType = 'Domestic';
         }
       }, {
-        text: 'Vehicle',
+        text: 'Automotive',
         icon: 'car',
         data: 10,
         handler: () => {
-          this.serviceList = this.vehicleServiceList;
+          this.frontEndserviceList = this.databaseService.vehicleServiceList;
           this.selectedJobType = 'Automotive';
         }
       }, {
@@ -66,7 +66,7 @@ export class SendReceiptPage implements OnInit {
         icon: 'file-tray-full',
         data: 'Data value',
         handler: () => {
-          this.serviceList = [];
+          this.frontEndserviceList = ['Other Services'];
           this.selectedJobType = 'Other';
         }
       }, {
@@ -74,37 +74,35 @@ export class SendReceiptPage implements OnInit {
         icon: 'close',
         role: 'cancel',
         handler: () => {
-          console.log('Cancel clicked');
+
         }
       }]
     });
     await actionSheet.present();
 
     const { role, data } = await actionSheet.onDidDismiss();
-    console.log('onDidDismiss resolved with role and data', role, data);
+
   }
 
-  onSubmit(form: NgForm) {
+  submitServiceAddForm(form: NgForm) {
 
-    const newReceiptData: ReceiptDetails = {
-      receiptID: null,
-      date: new Date(),
+    const newService: Jobitems = {
       jobType: this.selectedJobType,
       serviceType: form.value.serviceType,
-      price: form.value.receiptPrice,
-      customerName: form.value.customerName,
-      customerPhoneNo: form.value.phoneNo,
-      customerEmail: form.value.cusomteremail
-    };
+      description: form.value.serviceDescription,
+      price: form.value.servicePrice,
+      qty: this.defaultValue
+    }
 
-    this.printReceiptDetails = newReceiptData;
-    this.databaseService.sendReceiptDataToDatabase(newReceiptData);
-    this.downloadInvoice();
+    this.receiptSubTotal = this.receiptSubTotal + (newService.price*newService.qty);
+
+    this.receiptServiceItems.unshift(newService);
+    form.reset();
 
     }
 
 
-    downloadInvoice() {
+    createInvoicePDF() {
       this.content = document.getElementById('PrintInvoice').innerHTML;
       let options = {
         documentSize: 'A4',
@@ -127,8 +125,41 @@ export class SendReceiptPage implements OnInit {
     _onClickPrintInstrauctions() {
 
       this.printer.print(`base64://${this.printFile}`).then(onSuccess => {
-        console.log('send to printer')
+        this.receiptSubTotal = 0;
+        this.receiptServiceItems = [];
+        this.databaseService.receiptNoFromDatabase.availableSaleReceiptNo++;
+        this.databaseService.sendNewReceiptNoToDatabase();
       });
+    }
+
+    _printReceipt() {
+
+      const newReceiptData: ReceiptDetails = {
+        key: null,
+        receiptID: this.databaseService.receiptNoFromDatabase.availableSaleReceiptNo,
+        receiptdate: this.todayDate,
+        customerName: this.customerDetails.customerName,
+        customerPhoneNo: this.customerDetails.customerPhoneNo,
+        customerEmail: this.customerDetails.email,
+        jobArray: this.receiptServiceItems,
+        receiptTotal: this.receiptSubTotal,
+        pdfFileURL: null
+      };
+
+      this.databaseService.sendReceiptDataToDatabase(newReceiptData);
+      this.createInvoicePDF();
+    }
+
+    onCLickClearAll() {
+      this.customerDetails = {customerName: '', customerPhoneNo: '', email: ''};
+      this.receiptServiceItems = [];
+      this.receiptSubTotal = 0;
+
+    }
+
+    onClickDeleteService() {
+      this.receiptServiceItems = [];
+      this.receiptSubTotal = 0;
     }
 
 }

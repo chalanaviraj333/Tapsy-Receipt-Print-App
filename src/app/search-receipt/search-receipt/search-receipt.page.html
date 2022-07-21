@@ -1,0 +1,55 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Search Receipt</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-grid>
+    <form #f="ngForm" (ngSubmit)="onSubmitSearchForm(f)">
+    <ion-row style="margin-right: 13px;">
+      <ion-col>
+        <ion-item>
+            <ion-label position="stacked">Receipt ID</ion-label>
+            <ion-input type="tel" ngModel name="selectedReceiptID" placeholder="Enter without 'A'"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Customer Name</ion-label>
+          <ion-input type="text" ngModel name="selectedCustomerName"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Phone No</ion-label>
+          <ion-input type="tel" ngModel name="selectedCustomerPhone"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Customer Email</ion-label>
+          <ion-input type="email" ngModel name="selectedCustomerEmail"></ion-input>
+        </ion-item>
+        <ion-item style="padding-top: 20px;" lines="none">
+          <ion-datetime #datetime displayFormat="DD.MM.YYYY" presentation="date" max="{{todayDate.toISOString().split('T')[0]}}" color="success" ngModel name="selectedDate">
+          <span slot="title">Select Receipt Date</span>
+        </ion-datetime>
+        </ion-item>
+        <div style="text-align: right; margin-right: 10px; margin-top: 5px;">
+          <ion-button size="small" (click)="resetDate(f)">Reset Date</ion-button>
+        </div>
+
+      </ion-col>
+    </ion-row>
+  </form>
+  </ion-grid>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-button (click)="f.ngSubmit.emit()" color="success" expand="block" [disabled]="!f.valid">Search</ion-button>
+  </ion-toolbar>
+</ion-footer>

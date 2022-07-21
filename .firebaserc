@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "tapsy-invoice-app": {
+      "hosting": {
+        "app": [
+          "tapsy-invoice-app"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "tapsy-invoice-app"
+  }
+}

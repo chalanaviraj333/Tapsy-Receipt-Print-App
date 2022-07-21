@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { PDFGenerator } from '@ionic-native/pdf-generator/ngx';
 import { Printer } from '@awesome-cordova-plugins/printer/ngx';
 
+
 @NgModule({
   declarations: [AppComponent],
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, HttpClientModule, FormsModule],

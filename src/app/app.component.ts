@@ -8,8 +8,8 @@ export class AppComponent {
 
   public appPages = [
     { title: 'Create Receipt', url: '/send-receipt', icon: 'create' },
-    { title: 'Print', url: 'test-printing', icon: 'paper-plane' },
-    { title: 'Favorites', url: '/folder/Favorites', icon: 'heart' },
+    { title: 'Today', url: '/view-today-receipts', icon: 'receipt' },
+    { title: 'Search Receipt', url: '/search-receipt', icon: 'search' },
     { title: 'Archived', url: '/folder/Archived', icon: 'archive' },
     { title: 'Trash', url: '/folder/Trash', icon: 'trash' },
     { title: 'Spam', url: '/folder/Spam', icon: 'warning' },

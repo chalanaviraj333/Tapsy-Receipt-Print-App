@@ -1,0 +1,73 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Today</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-accordion-group *ngFor="let receipt of databaseService.todaysReceipts">
+    <ion-accordion value="first">
+      <ion-item slot="header" color="light">
+        <div style="text-align: left;">
+          <ion-label>A{{receipt.receiptID}}</ion-label>
+        </div>
+        <div style="text-align: right; margin-left: 20px;">
+          <ion-label>{{receipt.jobArray[0].serviceType}}</ion-label>
+        </div>
+        <div style="text-align: right; margin-left: 20px;">
+          <ion-label>${{receipt.receiptTotal}}</ion-label>
+        </div>
+      </ion-item>
+      <div class="ion-padding" slot="content">
+        <ion-card class="ion-no-margin">
+          <ion-card-title style="margin-left: 20px; margin-top: 15px;">{{receipt.customerName}}</ion-card-title>
+          <ion-card-header class="ion-no-margin ion-no-padding" style="margin-left: 20px;">{{receipt.customerPhoneNo}}</ion-card-header>
+          <ion-card-header class="ion-no-margin ion-no-padding" style="margin-left: 20px; margin-bottom: 20px;">{{receipt.customerEmail}}</ion-card-header>
+          <ion-card-content>
+            <ion-list *ngFor="let jobItem of receipt.jobArray">
+              <ion-item>
+                <table cellpadding="0" cellspacing="0" style="width: 100%;line-height: inherit;text-align: left;">
+                  <td colspan="3" style="padding: 5px;vertical-align: top; text-align: left;">
+                    <ion-label>{{jobItem.qty}}x{{jobItem.serviceType}}</ion-label>
+                    <ion-text style="font-size: 12px;">{{jobItem.description}}</ion-text>
+                  </td>
+                  <td colspan="3" style="padding: 5px;vertical-align: top; text-align: right;">
+                    <ion-label>{{jobItem.price*jobItem.qty}}</ion-label>
+                  </td>
+                </table>
+              </ion-item>
+            </ion-list>
+            <table cellpadding="0" cellspacing="0" style="width: 100%;line-height: inherit;text-align: left;">
+              <td colspan="3" style="margin-left: 20px;padding: 5px;vertical-align: top; text-align: left;">
+                <ion-label style="margin-left: 20px;">Total</ion-label>
+              </td>
+              <td colspan="3" style="padding: 5px;vertical-align: top; text-align: right;">
+                <ion-label style="text-align: right; margin-right: 10px;">${{receipt.receiptTotal}}</ion-label>
+              </td>
+            </table>
+          </ion-card-content>
+          <ion-toolbar>
+            <div style="text-align: right; padding: 10px;">
+              <ion-button color="success" (click)="onClickViewReceipt(receipt)">View Receipt</ion-button>
+            </div>
+          </ion-toolbar>
+        </ion-card>
+      </div>
+    </ion-accordion>
+  </ion-accordion-group>
+
+  <!-- <ion-card *ngFor="let receipt of databaseService.todaysReceipts"
+  class="ion-activatable ripple-parent ion-no-margin">
+    <ion-card-header>
+      {{receipt.date}}
+    </ion-card-header>
+  </ion-card> -->
+</ion-content>

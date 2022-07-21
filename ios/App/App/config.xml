@@ -6,6 +6,10 @@
     <param name="ios-package" value="PDFGenerator"/>
   </feature>
 
+  <feature name="EmailComposer">
+    <param name="ios-package" value="APPEmailComposer"/>
+  </feature>
+
   <feature name="Printer">
     <param name="ios-package" value="APPPrinter"/>
   </feature>

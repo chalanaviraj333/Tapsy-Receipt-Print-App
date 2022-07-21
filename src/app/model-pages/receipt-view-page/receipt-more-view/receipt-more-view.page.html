@@ -1,0 +1,137 @@
+<ion-toolbar style="padding-top: 50px; text-align: center;">
+  <ion-label>Pull Down to Close Preview</ion-label>
+</ion-toolbar>
+
+<ion-content>
+  <!-- invoice view starts here -->
+  <div id="PrintInvoice" class="invoice-box"
+  style="max-width: 800px;margin: auto;padding: 30px;border: 1px solid #eee;box-shadow: 0 0 10px rgba(0, 0, 0, .15);font-size: 16px;line-height: 24px;font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;color: #555;">
+  <table cellpadding="0" cellspacing="0" style="width: 100%;line-height: inherit;text-align: left;">
+    <tr class="top">
+      <td colspan="3" style="padding: 5px;vertical-align: top;">
+        <table style="width: 100%;line-height: inherit;text-align: left;">
+          <tr>
+            <td class="title"
+              style="padding: 5px;vertical-align: top;padding-bottom: 20px;font-size: 45px;line-height: 45px;color: #333;">
+              <img src="{{companyLogo}}" style="width:100%; max-width:130px;">
+            </td>
+
+            <td style="padding: 5px;vertical-align: top;text-align: right;padding-bottom: 20px;">
+              <span style="font-size: 32px;">TAX INVOICE</span>
+              <br>
+              <span style="font-size: 24px;">No: A{{selectedReceipt.receiptID}}</span>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr class="information">
+      <td colspan="3" style="padding: 5px;vertical-align: top;">
+        <table style="width: 100%;line-height: inherit;text-align: left;">
+          <tr>
+            <td style="padding: 5px;vertical-align: top;padding-bottom: 40px;">
+              <p style="font-size: 17px; line-height: 1.5;">
+                Tapsy Services PTY LTD
+                <br>
+              817 Logan Road
+              <br>
+              Holland Park West
+              <br>
+              QLD 4121
+              </p>
+            </td>
+
+            <td style="padding: 5px;vertical-align: top;text-align: right;padding-bottom: 40px;">
+              <span style="font-size: 17px;">Date: {{selectedReceipt.receiptdate.toISOString().split('T')[0]}}</span>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr class="information">
+      <td colspan="2" style="padding: 5px;vertical-align: top;">
+        <table style="width: 100%;line-height: inherit;text-align: left;">
+          <tr>
+            <td style="padding: 5px;vertical-align: top;padding-bottom: 40px;">
+              <span style="font-size: 17px;">Bill to:</span>
+              <br>
+              <span style="font-size: 18px;">Name: {{selectedReceipt.customerName}}</span>
+              <br>
+              <span *ngIf="selectedReceipt.customerPhoneNo !== ''" style="font-size: 18px;">Phone: {{selectedReceipt.customerPhoneNo}}</span>
+              <br>
+              <span *ngIf="selectedReceipt.customerEmail !== ''" style="font-size: 18px;">email: {{selectedReceipt.customerEmail}}</span>
+
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr class="heading">
+      <td style="padding: 5px;vertical-align: top;background: #eee;border-bottom: 1px solid #ddd;font-weight: bold;">
+        DESCRIPTION
+      </td>
+
+      <td
+        style="padding: 5px;vertical-align: top; text-align: right;background: #eee;border-bottom: 1px solid #ddd;font-weight: bold;">
+        QTY
+      </td>
+
+      <td
+        style="padding: 5px;vertical-align: top; text-align: right; background: #eee;border-bottom: 1px solid #ddd;font-weight: bold;">
+        AMOUNT
+      </td>
+    </tr>
+
+    <tr *ngFor="let item of selectedReceipt.jobArray" class="item">
+      <td style="padding: 5px;vertical-align: top;border-bottom: 1px solid #eee;">
+        {{item.serviceType}} - {{item.description}}
+      </td>
+
+      <td style="padding: 5px;vertical-align: top;text-align: right; border-bottom: 1px solid #eee;">
+        {{item.qty}}
+      </td>
+
+      <td style="padding: 5px;vertical-align: top; text-align: right; border-bottom: 1px solid #eee;">
+        ${{item.price*item.qty| number : '1.2-2'}}
+      </td>
+    </tr>
+
+
+    <tr class="total" style="margin-top: 20px;">
+      <td style="padding: 5px;vertical-align: top;"></td>
+
+      <td style="padding: 5px;vertical-align: top;text-align: right;font-size: 16px;">
+        <span>SUBTOTAL</span>
+        <br>
+        <span>GST</span>
+        <br>
+        <span>TOTAL</span>
+        <br>
+        <span>AMOUNT DUE</span>
+        <br>
+      </td>
+
+      <td style="padding: 5px;vertical-align: top;text-align: right;border-bottom: 1px solid #eee;font-size: 16px;">
+        <span>${{(this.selectedReceipt.receiptTotal/10)*9 | number : '1.2-2'}}</span>
+        <br>
+        <span>${{this.selectedReceipt.receiptTotal/10 | number : '1.2-2'}}</span>
+        <br>
+        <span style="font-weight: bold;">${{this.selectedReceipt.receiptTotal | number : '1.2-2'}}</span>
+        <br>
+        <span>$0.00</span>
+        <br>
+      </td>
+    </tr>
+  </table>
+</div>
+  <!-- invocie view ends here -->
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-button (click)="printReceipt()" color="success" expand="block">Print Receipt</ion-button>
+  </ion-toolbar>
+</ion-footer>

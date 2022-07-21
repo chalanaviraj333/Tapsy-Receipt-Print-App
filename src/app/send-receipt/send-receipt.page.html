@@ -14,7 +14,6 @@
   </ion-header>
 
   <ion-grid>
-    <form #f="ngForm" (ngSubmit)="onSubmit(f)">
     <ion-row>
       <ion-col size="8">
         <ion-item lines="none">
@@ -24,14 +23,14 @@
         </ion-item>
       </ion-col>
       <ion-col size="4">
-        <ion-button size="small" color="success" disabled>Change</ion-button>
+        <ion-button size="small" color="danger" (click)="onCLickClearAll()">CLEAR ALL</ion-button>
       </ion-col>
     </ion-row>
 
     <ion-row class="margin-class">
       <ion-col size="12">
         <ion-item>
-          <ion-input type="text" [(ngModel)]="printReceiptDetails.customerName" name="customerName" placeholder="Customer Name" required></ion-input>
+          <ion-input type="text" [(ngModel)]="customerDetails.customerName" name="customerName" placeholder="Customer Name*" required></ion-input>
         </ion-item>
       </ion-col>
     </ion-row>
@@ -39,7 +38,7 @@
     <ion-row class="margin-class">
       <ion-col size="12">
         <ion-item>
-          <ion-input type="tel" [(ngModel)]="printReceiptDetails.customerPhoneNo"  name="phoneNo" placeholder="Phone No"></ion-input>
+          <ion-input type="tel" [(ngModel)]="customerDetails.customerPhoneNo"  name="phoneNo" placeholder="Phone No"></ion-input>
         </ion-item>
       </ion-col>
     </ion-row>
@@ -47,43 +46,38 @@
     <ion-row class="margin-class">
       <ion-col size="12">
         <ion-item>
-          <ion-input type="email" [(ngModel)]="printReceiptDetails.customerEmail"  name="cusomteremail" placeholder="Email"></ion-input>
+          <ion-input type="email" [(ngModel)]="customerDetails.email"  name="cusomteremail" placeholder="Email"></ion-input>
         </ion-item>
       </ion-col>
     </ion-row>
 
 
     <ion-card>
+      <form #f="ngForm" (ngSubmit)="submitServiceAddForm(f)">
       <ion-card-header>Add Services</ion-card-header>
       <ion-card-content>
         <ion-grid>
           <ion-row>
             <ion-col>
-              <ion-button expand="block" color="dark" fill="outline" (click)="presentActionSheet();">Job Type</ion-button>
+              <ion-button expand="block" color="dark" fill="outline" (click)="presentActionSheet();">{{this.selectedJobType}}</ion-button>
             </ion-col>
           </ion-row>
           <ion-row>
             <ion-col size="12">
               <ion-list>
-                <ion-item>
                   <ion-select placeholder="Select Service" ngModel name="serviceType" required>
-                    <ion-select-option *ngFor="let serviceItem of serviceList" value="{{serviceItem}}">{{serviceItem}}</ion-select-option>
+                    <ion-select-option *ngFor="let serviceItem of frontEndserviceList" value="{{serviceItem}}">{{serviceItem}}</ion-select-option>
                   </ion-select>
-                </ion-item>
               </ion-list>
             </ion-col>
           </ion-row>
 
           <ion-row>
             <ion-col size="8">
-              <ion-item>
-                <ion-input type="tel" ngModel name="receiptPrice" placeholder="Enter Price" required></ion-input>
-              </ion-item>
+                <ion-input class="inputTextClass" type="tel" ngModel name="servicePrice" placeholder="Enter Price" required></ion-input>
             </ion-col>
             <ion-col size="4">
-              <ion-item>
-                <ion-input type="number" ngModel="{{defaultValue}}" name="itemQuantity" required></ion-input>
-              </ion-item>
+                <ion-input class="inputTextClass" type="number" [(ngModel)]="defaultValue" name="serviceQuantity" required></ion-input>
             </ion-col>
           </ion-row>
 
@@ -92,17 +86,44 @@
               <ion-textarea rows="3" ngModel name="serviceDescription" placeholder="Description"></ion-textarea>
             </ion-col>
           </ion-row>
-        </ion-grid>
 
-        <div style="text-align: right;">
-          <ion-button color="success">
-            ADD
-            <ion-icon slot="end" name="add-outline"></ion-icon>
-          </ion-button>
-        </div>
+          <ion-row>
+            <ion-col size="5">
+              <ion-button color="danger" (click)="onClickDeleteService()">
+                CLEAR
+                <ion-icon slot="end" name="trash-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+
+            <ion-col size="7">
+              <ion-button expand="block" color="success" type="submit" [disabled]="!f.valid">
+                ADD
+                <ion-icon slot="end" name="add-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
       </ion-card-content>
+    </form>
     </ion-card>
-  </form>
+
+    <ion-row>
+      <ion-col>
+        <ion-list *ngFor="let jobItem of receiptServiceItems">
+          <ion-item>
+            <table cellpadding="0" cellspacing="0" style="width: 100%;line-height: inherit;text-align: left;">
+              <td colspan="3" style="padding: 5px;vertical-align: top; text-align: left;">
+                <ion-label>{{jobItem.serviceType}}</ion-label>
+                <ion-text style="font-size: 12px;">{{jobItem.description}}</ion-text>
+              </td>
+              <td colspan="3" style="padding: 5px;vertical-align: top; text-align: right;">
+                <ion-label>{{jobItem.price*jobItem.qty}}</ion-label>
+              </td>
+            </table>
+          </ion-item>
+        </ion-list>
+      </ion-col>
+    </ion-row>
   </ion-grid>
 
   <!-- invoice view starts here -->
@@ -121,7 +142,7 @@
             <td style="padding: 5px;vertical-align: top;text-align: right;padding-bottom: 20px;">
               <span style="font-size: 32px;">TAX INVOICE</span>
               <br>
-              <span style="font-size: 24px;">No: A102</span>
+              <span style="font-size: 24px;">No: A{{this.databaseService.receiptNoFromDatabase.availableSaleReceiptNo}}</span>
             </td>
           </tr>
         </table>
@@ -145,7 +166,7 @@
             </td>
 
             <td style="padding: 5px;vertical-align: top;text-align: right;padding-bottom: 40px;">
-              <span style="font-size: 17px;">Date: {{printReceiptDetails.date.toISOString().split('T')[0]}}</span>
+              <span style="font-size: 17px;">Date: {{todayDate.toISOString().split('T')[0]}}</span>
             </td>
           </tr>
         </table>
@@ -159,11 +180,11 @@
             <td style="padding: 5px;vertical-align: top;padding-bottom: 40px;">
               <span style="font-size: 17px;">Bill to:</span>
               <br>
-              <span style="font-size: 18px;">Name: {{printReceiptDetails.customerName}}</span>
+              <span style="font-size: 18px;">Name: {{customerDetails.customerName}}</span>
               <br>
-              <span *ngIf="printReceiptDetails.customerPhoneNo !== ''" style="font-size: 18px;">Phone: {{printReceiptDetails.customerPhoneNo}}</span>
+              <span *ngIf="customerDetails.customerPhoneNo !== ''" style="font-size: 18px;">Phone: {{customerDetails.customerPhoneNo}}</span>
               <br>
-              <span *ngIf="printReceiptDetails.customerEmail !== ''" style="font-size: 18px;">email: {{printReceiptDetails.customerEmail}}</span>
+              <span *ngIf="customerDetails.email !== ''" style="font-size: 18px;">email: {{customerDetails.email}}</span>
 
             </td>
           </tr>
@@ -189,15 +210,15 @@
 
     <tr *ngFor="let item of receiptServiceItems" class="item">
       <td style="padding: 5px;vertical-align: top;border-bottom: 1px solid #eee;">
-        {{item.description}}
+        {{item.serviceType}} - {{item.description}}
       </td>
 
       <td style="padding: 5px;vertical-align: top;text-align: right; border-bottom: 1px solid #eee;">
-        1
+        {{item.qty}}
       </td>
 
       <td style="padding: 5px;vertical-align: top; text-align: right; border-bottom: 1px solid #eee;">
-        ${{item.price | number : '1.2-2'}}
+        ${{item.price*item.qty| number : '1.2-2'}}
       </td>
     </tr>
 
@@ -206,7 +227,6 @@
       <td style="padding: 5px;vertical-align: top;"></td>
 
       <td style="padding: 5px;vertical-align: top;text-align: right;font-size: 16px;">
-        <!-- Total: ${{order.grandTotal}} -->
         <span>SUBTOTAL</span>
         <br>
         <span>GST</span>
@@ -218,12 +238,11 @@
       </td>
 
       <td style="padding: 5px;vertical-align: top;text-align: right;border-bottom: 1px solid #eee;font-size: 16px;">
-        <!-- Total: ${{order.grandTotal}} -->
-        <span>$119.00</span>
+        <span>${{(this.receiptSubTotal/10)*9 | number : '1.2-2'}}</span>
         <br>
-        <span>$20.00</span>
+        <span>${{this.receiptSubTotal/10 | number : '1.2-2'}}</span>
         <br>
-        <span style="font-weight: bold;">$139.00</span>
+        <span style="font-weight: bold;">${{this.receiptSubTotal | number : '1.2-2'}}</span>
         <br>
         <span>$0.00</span>
         <br>
@@ -236,9 +255,9 @@
 </ion-content>
 <ion-footer>
   <ion-toolbar>
-    <!-- <ion-button (click)="f.ngSubmit.emit()" [disabled]="!f.valid" color="secondary" fill="outline" expand="block">Email Receipt</ion-button> -->
-    <ion-button (click)="f.ngSubmit.emit()" [disabled]="!f.valid" color="success" expand="block">Print Receipt</ion-button>
+    <div *ngIf="customerDetails.customerName !== '' && receiptServiceItems.length !== 0">
+      <ion-button (click)="_printReceipt()" color="success" expand="block">Print Receipt</ion-button>
+    </div>
   </ion-toolbar>
 </ion-footer>
 
-<!-- (click)="f.ngSubmit.emit()" [disabled]="!f.valid" -->
